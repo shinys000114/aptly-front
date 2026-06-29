@@ -1,0 +1,50 @@
+{{define "repos"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Repos</h1>
+  <p>Local repository를 생성하고 관리할 repo를 선택합니다.</p>
+</section>
+
+<form class="panel form" method="post" action="/repos">
+  <input type="hidden" name="action" value="create">
+  <h2>Create repo</h2>
+  <label>Name<input required name="name"></label>
+  <label>Distribution<input name="distribution" placeholder="bookworm"></label>
+  <label>Component<input name="component" placeholder="main"></label>
+  <label>Comment<input name="comment"></label>
+  <button type="submit">Create</button>
+</form>
+
+<section class="panel">
+  <h2>Repos</h2>
+  <div class="toolbar">
+    <input data-filter-table="#repos-table" placeholder="Filter repos">
+  </div>
+  <form method="post" action="/repos">
+    <div class="bulkbar">
+      <label class="check"><input type="checkbox" data-check-all="#repos-table"> select all</label>
+      <label class="check"><input type="checkbox" name="force"> force</label>
+      <button class="danger" type="submit" name="action" value="delete">Delete selected</button>
+    </div>
+  <div class="table-wrap">
+    <table id="repos-table">
+      <thead><tr><th></th><th>Name</th><th>Distribution</th><th>Component</th><th>Comment</th></tr></thead>
+      <tbody>
+      {{range .Content}}
+        <tr>
+          <td><input type="checkbox" name="name" value="{{.Name}}"></td>
+          <td><a href="/repos/{{pathEscape .Name}}">{{.Name}}</a></td>
+          <td>{{.DefaultDistribution}}</td>
+          <td>{{.DefaultComponent}}</td>
+          <td>{{.Comment}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="5" class="muted">No repos</td></tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  </form>
+</section>
+{{template "footer" .}}
+{{end}}

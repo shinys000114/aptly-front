@@ -1,0 +1,37 @@
+{{define "header"}}
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.Title}} · aptly-front</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">aptly-front</a>
+    <nav class="nav">
+      <a href="/" class="{{if eq .Active "dashboard"}}active{{end}}">Dashboard</a>
+      <a href="/repos" class="{{if eq .Active "repos"}}active{{end}}">Repos</a>
+      <a href="/mirrors" class="{{if eq .Active "mirrors"}}active{{end}}">Mirrors</a>
+      <a href="/snapshots" class="{{if eq .Active "snapshots"}}active{{end}}">Snapshots</a>
+      <a href="/publish" class="{{if eq .Active "publish"}}active{{end}}">Publish</a>
+      <a href="/graph" class="{{if eq .Active "graph"}}active{{end}}">Graph</a>
+      <a href="/tasks" class="{{if eq .Active "tasks"}}active{{end}}">Tasks</a>
+      <a href="/files" class="{{if eq .Active "files"}}active{{end}}">Files</a>
+      <a href="/api-console" class="{{if eq .Active "api"}}active{{end}}">API</a>
+    </nav>
+    <div class="api-url">{{.APIURL}}</div>
+  </header>
+
+  <main class="page">
+    {{if .Flash}}<div class="notice">{{.Flash}}</div>{{end}}
+    {{if .Error}}<div class="notice error">{{.Error}}</div>{{end}}
+{{end}}
+
+{{define "footer"}}
+  </main>
+</body>
+</html>
+{{end}}

@@ -1,0 +1,29 @@
+{{define "tasks"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Tasks</h1>
+  <p>aptly background task 상태를 확인합니다.</p>
+</section>
+
+<section class="panel">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Type</th><th>State</th><th>Description</th><th>Error</th></tr></thead>
+      <tbody>
+      {{range .Content}}
+        <tr>
+          <td>{{.ID}}</td>
+          <td>{{.Type}}</td>
+          <td><span class="state">{{.State}}</span></td>
+          <td>{{.Description}}</td>
+          <td>{{.Error}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="5" class="muted">No tasks</td></tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+{{template "footer" .}}
+{{end}}

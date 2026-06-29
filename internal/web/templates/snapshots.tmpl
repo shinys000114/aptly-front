@@ -1,0 +1,40 @@
+{{define "snapshots"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Snapshots</h1>
+  <p>Snapshots 목록과 source 관계를 확인합니다. Merge, pull, filter 등 고급 작업은 API 콘솔에서 호출할 수 있습니다.</p>
+</section>
+
+<section class="panel">
+  <h2>Snapshots</h2>
+  <div class="toolbar">
+    <input data-filter-table="#snapshots-table" placeholder="Filter snapshots">
+  </div>
+  <form method="post" action="/snapshots">
+    <div class="bulkbar">
+      <label class="check"><input type="checkbox" data-check-all="#snapshots-table"> select all</label>
+      <label class="check"><input type="checkbox" name="force"> force</label>
+      <button class="danger" type="submit" name="action" value="delete">Delete selected</button>
+    </div>
+  <div class="table-wrap">
+    <table id="snapshots-table">
+      <thead><tr><th></th><th>Name</th><th>Created</th><th>Source</th><th>Description</th></tr></thead>
+      <tbody>
+      {{range .Content}}
+        <tr>
+          <td><input type="checkbox" name="name" value="{{.Name}}"></td>
+          <td><a href="/snapshots/{{pathEscape .Name}}">{{.Name}}</a></td>
+          <td>{{.CreatedAt}}</td>
+          <td>{{.SourceKind}} {{join .SourceIDs ", "}}</td>
+          <td>{{.Description}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="5" class="muted">No snapshots</td></tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  </form>
+</section>
+{{template "footer" .}}
+{{end}}

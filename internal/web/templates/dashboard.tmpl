@@ -1,0 +1,55 @@
+{{define "dashboard"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Dashboard</h1>
+  <p>aptly API 상태와 주요 리소스 수를 확인합니다.</p>
+</section>
+
+<section class="metrics">
+  <a class="metric" href="/repos">
+    <span>Repos</span>
+    <strong>{{len .Content.Repos}}</strong>
+  </a>
+  <a class="metric" href="/mirrors">
+    <span>Mirrors</span>
+    <strong>{{len .Content.Mirrors}}</strong>
+  </a>
+  <a class="metric" href="/snapshots">
+    <span>Snapshots</span>
+    <strong>{{len .Content.Snapshots}}</strong>
+  </a>
+  <a class="metric" href="/publish">
+    <span>Published</span>
+    <strong>{{len .Content.Publishes}}</strong>
+  </a>
+</section>
+
+<section class="panel">
+  <h2>API</h2>
+  <dl class="kv">
+    <dt>URL</dt><dd>{{.APIURL}}</dd>
+    <dt>Version</dt><dd>{{if .Content.Version.Version}}{{.Content.Version.Version}}{{else}}unknown{{end}}</dd>
+  </dl>
+</section>
+
+<section class="panel">
+  <h2>Recent snapshots</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Source</th><th>Description</th></tr></thead>
+      <tbody>
+      {{range .Content.Snapshots}}
+        <tr>
+          <td><a href="/snapshots/{{pathEscape .Name}}">{{.Name}}</a></td>
+          <td>{{.SourceKind}} {{join .SourceIDs ", "}}</td>
+          <td>{{.Description}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="3" class="muted">No snapshots</td></tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+</section>
+{{template "footer" .}}
+{{end}}

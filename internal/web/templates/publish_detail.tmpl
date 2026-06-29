@@ -1,0 +1,51 @@
+{{define "publish_detail"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Published: {{.Content.Publish.Distribution}}</h1>
+  <p>{{.Content.Publish.Prefix}} published repository 상세 정보입니다.</p>
+</section>
+
+<section class="panel">
+  <h2>Details</h2>
+  <dl class="kv">
+    <dt>Storage</dt><dd>{{.Content.Publish.Storage}}</dd>
+    <dt>Prefix</dt><dd>{{.Content.Publish.Prefix}}</dd>
+    <dt>Distribution</dt><dd>{{.Content.Publish.Distribution}}</dd>
+    <dt>Source kind</dt><dd>{{.Content.Publish.SourceKind}}</dd>
+    <dt>Architectures</dt><dd>{{stringSlice .Content.Publish.Architectures}}</dd>
+    <dt>Sources</dt><dd>{{range .Content.Publish.Sources}}<span class="pill">{{.Component}}: {{.Name}}</span>{{end}}</dd>
+  </dl>
+</section>
+
+<section class="split">
+  <form class="panel form" method="post" action="/publish">
+    <input type="hidden" name="action" value="switch">
+    <input type="hidden" name="storage" value="{{.Content.Publish.Storage}}">
+    <input type="hidden" name="prefix" value="{{.Content.Publish.Prefix}}">
+    <input type="hidden" name="distribution" value="{{.Content.Publish.Distribution}}">
+    <h2>Switch published snapshot</h2>
+    <label>Component<input required name="component" value="{{firstComponent .Content.Publish.Sources}}"></label>
+    <label>Snapshot<input required name="snapshot" list="switch-snapshot-options"></label>
+    <datalist id="switch-snapshot-options">
+      {{range .Content.Snapshots}}<option value="{{.Name}}"></option>{{end}}
+    </datalist>
+    <label class="check"><input type="checkbox" name="skip_signing" checked> skip signing</label>
+    <label class="check"><input type="checkbox" name="sign_batch" checked> batch signing</label>
+    <label>GPG key id<input name="gpg_key"></label>
+    <label>Keyring path<input name="keyring" placeholder="/path/to/trustedkeys.gpg"></label>
+    <label>Secret keyring path<input name="secret_keyring" placeholder="/path/to/secring.gpg"></label>
+    <label>Passphrase file path<input name="passphrase_file" placeholder="/path/to/passphrase"></label>
+    <button type="submit">Switch</button>
+  </form>
+
+  <form class="panel form" method="post" action="/publish">
+    <input type="hidden" name="action" value="drop">
+    <input type="hidden" name="prefix" value="{{.Content.Publish.Prefix}}">
+    <input type="hidden" name="distribution" value="{{.Content.Publish.Distribution}}">
+    <h2>Drop published repository</h2>
+    <label class="check"><input type="checkbox" name="force"> force</label>
+    <button class="danger" type="submit">Drop</button>
+  </form>
+</section>
+{{template "footer" .}}
+{{end}}

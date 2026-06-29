@@ -1,0 +1,18 @@
+{{define "files"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Files</h1>
+  <p>aptly upload file directories입니다. Upload/delete는 multipart 처리가 필요하므로 API 콘솔 또는 curl로 수행하세요.</p>
+</section>
+
+<section class="panel">
+  <ul class="list">
+    {{range .Content}}
+      <li>{{.}}</li>
+    {{else}}
+      <li class="muted">No file directories</li>
+    {{end}}
+  </ul>
+</section>
+{{template "footer" .}}
+{{end}}

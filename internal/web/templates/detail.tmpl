@@ -1,0 +1,176 @@
+{{define "detail"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>{{.Content.Kind}}: {{.Content.Name}}</h1>
+  <p>{{.Content.Name}} 작업 화면입니다.</p>
+</section>
+
+{{if eq .Content.Kind "repo"}}
+<section class="split">
+  <form class="panel form" method="post" action="/repos">
+    <input type="hidden" name="action" value="snapshot">
+    <input type="hidden" name="repo" value="{{.Content.Name}}">
+    <h2>Snapshot this repo</h2>
+    <label>Snapshot name<input required name="snapshot"></label>
+    <label>Description<input name="description"></label>
+    <button type="submit">Create snapshot</button>
+  </form>
+
+  <form class="panel form" method="post" action="/publish">
+    <input type="hidden" name="action" value="create">
+    <input type="hidden" name="source_kind" value="local">
+    <input type="hidden" name="source_name" value="{{.Content.Name}}">
+    <h2>Publish this repo</h2>
+    <label>Prefix<input name="prefix" placeholder="."></label>
+    <label>Distribution<input required name="distribution"></label>
+    <label>Component<input required name="component" value="main"></label>
+    <label>Architectures<input name="architectures" placeholder="amd64 arm64"></label>
+    <label class="check"><input type="checkbox" name="skip_signing" checked> skip signing</label>
+    <label class="check"><input type="checkbox" name="sign_batch" checked> batch signing</label>
+    <label>GPG key id<input name="gpg_key"></label>
+    <label>Keyring path<input name="keyring" placeholder="/path/to/trustedkeys.gpg"></label>
+    <label>Secret keyring path<input name="secret_keyring" placeholder="/path/to/secring.gpg"></label>
+    <label>Passphrase file path<input name="passphrase_file" placeholder="/path/to/passphrase"></label>
+    <button type="submit">Publish repo</button>
+  </form>
+</section>
+
+<section class="split">
+  <form class="panel form" method="post" action="/repos">
+    <input type="hidden" name="action" value="add_package_refs">
+    <input type="hidden" name="repo" value="{{.Content.Name}}">
+    <h2>Add package refs</h2>
+    <label>Package refs<textarea required name="package_refs" rows="8" placeholder="Parm64 package version key"></textarea></label>
+    <button type="submit">Add refs</button>
+  </form>
+
+  <form class="panel form" method="post" action="/repos" enctype="multipart/form-data">
+    <input type="hidden" name="action" value="upload_deb">
+    <input type="hidden" name="repo" value="{{.Content.Name}}">
+    <h2>Upload .deb files</h2>
+    <label>Upload directory<input name="upload_dir" placeholder="aptly-front-{{.Content.Name}}"></label>
+    <label>Files<input required type="file" name="deb_files" accept=".deb" multiple></label>
+    <label class="check"><input type="checkbox" name="add_after_upload" checked> add to repo after upload</label>
+    <label class="check"><input type="checkbox" name="no_remove" checked> keep uploaded files</label>
+    <label class="check"><input type="checkbox" name="force_replace"> force replace</label>
+    <button type="submit">Upload and add</button>
+  </form>
+</section>
+
+<section class="split">
+  <form class="panel form" method="post" action="/repos">
+    <input type="hidden" name="action" value="add_file_dir">
+    <input type="hidden" name="repo" value="{{.Content.Name}}">
+    <h2>Add uploaded files</h2>
+    {{if .Content.FileDirsErr}}<div class="notice error">{{.Content.FileDirsErr}}</div>{{end}}
+    <label>Upload directory
+      <input required name="dir" list="file-dir-options">
+    </label>
+    <datalist id="file-dir-options">
+      {{range .Content.FileDirs}}<option value="{{.}}"></option>{{end}}
+    </datalist>
+    <label class="check"><input type="checkbox" name="no_remove" checked> keep uploaded files</label>
+    <label class="check"><input type="checkbox" name="force_replace"> force replace</label>
+    <button type="submit">Add files</button>
+  </form>
+</section>
+
+<section class="panel">
+  <h2>Packages</h2>
+  {{if .Content.PackagesErr}}<div class="notice error">{{.Content.PackagesErr}}</div>{{end}}
+  <form class="toolbar" method="get" action="/repos/{{pathEscape .Content.Name}}">
+    <input name="q" value="{{.Content.PackageQuery}}" placeholder="aptly package query">
+    <button type="submit">Search</button>
+  </form>
+  <div class="toolbar">
+    <input data-filter-table="#repo-packages-table" placeholder="Filter visible packages">
+  </div>
+  <form method="post" action="/repos">
+    <input type="hidden" name="action" value="delete_package_refs">
+    <input type="hidden" name="repo" value="{{.Content.Name}}">
+    <div class="bulkbar">
+      <label class="check"><input type="checkbox" data-check-all="#repo-packages-table"> select all</label>
+      <button class="danger" type="submit">Delete selected packages</button>
+    </div>
+  <div class="table-wrap">
+    <table id="repo-packages-table">
+      <thead><tr><th></th><th>Type</th><th>Arch</th><th>Name</th><th>Version</th><th>Key</th><th>Raw ref</th></tr></thead>
+      <tbody>
+      {{range .Content.Packages}}
+        <tr>
+          <td><input type="checkbox" name="package_ref" value="{{.Raw}}"></td>
+          <td class="mono">{{.Type}}</td>
+          <td class="mono">{{.Arch}}</td>
+          <td>{{.Name}}</td>
+          <td class="mono">{{.Version}}</td>
+          <td class="mono">{{.Key}}</td>
+          <td class="mono muted">{{.Raw}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="7" class="muted">No packages</td></tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  </form>
+</section>
+{{else if eq .Content.Kind "mirror"}}
+<section class="split">
+  <form class="panel form" method="post" action="/mirrors">
+    <input type="hidden" name="action" value="update">
+    <input type="hidden" name="name" value="{{.Content.Name}}">
+    <h2>Update this mirror</h2>
+    <button type="submit">Update mirror</button>
+  </form>
+
+  <form class="panel form" method="post" action="/mirrors">
+    <input type="hidden" name="action" value="snapshot">
+    <input type="hidden" name="mirror" value="{{.Content.Name}}">
+    <h2>Snapshot this mirror</h2>
+    <label>Snapshot name<input required name="snapshot"></label>
+    <label>Description<input name="description"></label>
+    <button type="submit">Create snapshot</button>
+  </form>
+</section>
+<form class="panel form" method="post" action="/publish">
+  <input type="hidden" name="action" value="create">
+  <input type="hidden" name="source_kind" value="mirror">
+  <input type="hidden" name="source_name" value="{{.Content.Name}}">
+  <h2>Publish this mirror</h2>
+  <label>Prefix<input name="prefix" placeholder="."></label>
+  <label>Distribution<input required name="distribution"></label>
+  <label>Component<input required name="component" value="main"></label>
+  <label>Architectures<input name="architectures" placeholder="amd64 arm64"></label>
+  <label class="check"><input type="checkbox" name="skip_signing" checked> skip signing</label>
+  <label class="check"><input type="checkbox" name="sign_batch" checked> batch signing</label>
+  <label>GPG key id<input name="gpg_key"></label>
+  <label>Keyring path<input name="keyring" placeholder="/path/to/trustedkeys.gpg"></label>
+  <label>Secret keyring path<input name="secret_keyring" placeholder="/path/to/secring.gpg"></label>
+  <label>Passphrase file path<input name="passphrase_file" placeholder="/path/to/passphrase"></label>
+  <button type="submit">Publish mirror</button>
+</form>
+{{else if eq .Content.Kind "snapshot"}}
+<form class="panel form" method="post" action="/publish">
+  <input type="hidden" name="action" value="create">
+  <input type="hidden" name="source_kind" value="snapshot">
+  <input type="hidden" name="source_name" value="{{.Content.Name}}">
+  <h2>Publish this snapshot</h2>
+  <label>Prefix<input name="prefix" placeholder="."></label>
+  <label>Distribution<input required name="distribution"></label>
+  <label>Component<input required name="component" value="main"></label>
+  <label>Architectures<input name="architectures" placeholder="amd64 arm64"></label>
+  <label class="check"><input type="checkbox" name="skip_signing" checked> skip signing</label>
+  <label class="check"><input type="checkbox" name="sign_batch" checked> batch signing</label>
+  <label>GPG key id<input name="gpg_key"></label>
+  <label>Keyring path<input name="keyring" placeholder="/path/to/trustedkeys.gpg"></label>
+  <label>Secret keyring path<input name="secret_keyring" placeholder="/path/to/secring.gpg"></label>
+  <label>Passphrase file path<input name="passphrase_file" placeholder="/path/to/passphrase"></label>
+  <button type="submit">Publish snapshot</button>
+</form>
+{{else}}
+<section class="panel">
+  <p class="muted">이 리소스는 아직 전용 상세 작업이 없습니다.</p>
+</section>
+{{end}}
+{{template "footer" .}}
+{{end}}

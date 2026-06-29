@@ -1,0 +1,42 @@
+{{define "publish"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Publish</h1>
+  <p>Published repository를 선택해서 상세 정보와 switch/drop 작업을 수행합니다.</p>
+</section>
+
+<section class="panel">
+  <h2>Published repositories</h2>
+  <div class="toolbar">
+    <input data-filter-table="#publish-table" placeholder="Filter published repositories">
+  </div>
+  <form method="post" action="/publish">
+    <div class="bulkbar">
+      <label class="check"><input type="checkbox" data-check-all="#publish-table"> select all</label>
+      <label class="check"><input type="checkbox" name="force"> force</label>
+      <button class="danger" type="submit" name="action" value="drop">Drop selected</button>
+    </div>
+  <div class="table-wrap">
+    <table id="publish-table">
+      <thead><tr><th></th><th>Storage</th><th>Prefix</th><th>Distribution</th><th>Source kind</th><th>Sources</th><th>Architectures</th></tr></thead>
+      <tbody>
+      {{range .Content.Publishes}}
+        <tr>
+          <td><input type="checkbox" name="target" value="{{publishTarget .Storage .Prefix .Distribution}}"></td>
+          <td>{{.Storage}}</td>
+          <td><a href="{{publishDetailPath .Storage .Prefix .Distribution}}">{{.Prefix}}</a></td>
+          <td><a href="{{publishDetailPath .Storage .Prefix .Distribution}}">{{.Distribution}}</a></td>
+          <td>{{.SourceKind}}</td>
+          <td>{{range .Sources}}<span class="pill">{{.Component}}: {{.Name}}</span>{{end}}</td>
+          <td>{{stringSlice .Architectures}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="7" class="muted">No published repositories</td></tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  </form>
+</section>
+{{template "footer" .}}
+{{end}}

@@ -1,0 +1,19 @@
+{{define "graph"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Graph</h1>
+  <p>repo, mirror, snapshot, publish 관계를 API 응답 기준으로 표시합니다.</p>
+</section>
+
+<section class="graph-shell">
+  <div id="graph" class="graph" data-graph='{{rawjson .Content}}'></div>
+  <aside class="legend">
+    <span><i class="dot repo"></i>repo</span>
+    <span><i class="dot mirror"></i>mirror</span>
+    <span><i class="dot snapshot"></i>snapshot</span>
+    <span><i class="dot publish"></i>publish</span>
+  </aside>
+</section>
+<script src="/static/graph.js"></script>
+{{template "footer" .}}
+{{end}}

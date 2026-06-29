@@ -1,0 +1,39 @@
+{{define "api_console"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>API Console</h1>
+  <p>전용 UI에 아직 없는 aptly API를 직접 호출합니다. Path는 /api/ 로 시작해야 합니다.</p>
+</section>
+
+<section class="split">
+  <form class="panel form" method="post" action="/api-console">
+    <h2>Request</h2>
+    <label>Method
+      <select name="method">
+        {{$m := .Content.Method}}
+        <option {{if eq $m "GET"}}selected{{end}}>GET</option>
+        <option {{if eq $m "POST"}}selected{{end}}>POST</option>
+        <option {{if eq $m "PUT"}}selected{{end}}>PUT</option>
+        <option {{if eq $m "DELETE"}}selected{{end}}>DELETE</option>
+      </select>
+    </label>
+    <label>Path<input required name="path" value="{{.Content.Path}}" placeholder="/api/repos"></label>
+    <label>JSON body<textarea name="body" rows="14" spellcheck="false">{{.Content.Body}}</textarea></label>
+    <button type="submit">Send</button>
+  </form>
+
+  <section class="panel">
+    <h2>Response</h2>
+    {{if .Content.Status}}
+      <dl class="kv">
+        <dt>Status</dt><dd>{{.Content.Status}}</dd>
+        <dt>Content-Type</dt><dd>{{.Content.ContentType}}</dd>
+      </dl>
+      <pre class="code">{{.Content.Response}}</pre>
+    {{else}}
+      <p class="muted">No response yet</p>
+    {{end}}
+  </section>
+</section>
+{{template "footer" .}}
+{{end}}

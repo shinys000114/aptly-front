@@ -1,0 +1,56 @@
+{{define "mirrors"}}
+{{template "header" .}}
+<section class="section-head">
+  <h1>Mirrors</h1>
+  <p>Remote repository mirror를 생성하고 관리할 mirror를 선택합니다.</p>
+</section>
+
+<form class="panel form" method="post" action="/mirrors">
+  <input type="hidden" name="action" value="create">
+  <h2>Create mirror</h2>
+  <label>Name<input required name="name"></label>
+  <label>Archive URL<input required name="url" placeholder="http://deb.debian.org/debian"></label>
+  <label>Distribution<input required name="distribution" placeholder="bookworm"></label>
+  <label>Components<input name="components" placeholder="main contrib non-free"></label>
+  <label>Architectures<input name="architectures" placeholder="amd64 arm64"></label>
+  <label>Filter<input name="filter"></label>
+  <label class="check"><input type="checkbox" name="filter_with_deps"> filter with dependencies</label>
+  <label class="check"><input type="checkbox" name="ignore_signatures"> ignore signatures</label>
+  <button type="submit">Create</button>
+</form>
+
+<section class="panel">
+  <h2>Mirrors</h2>
+  <div class="toolbar">
+    <input data-filter-table="#mirrors-table" placeholder="Filter mirrors">
+  </div>
+  <form method="post" action="/mirrors">
+    <div class="bulkbar">
+      <label class="check"><input type="checkbox" data-check-all="#mirrors-table"> select all</label>
+      <label class="check"><input type="checkbox" name="force"> force</label>
+      <button type="submit" name="action" value="update">Update selected</button>
+      <button class="danger" type="submit" name="action" value="delete">Delete selected</button>
+    </div>
+  <div class="table-wrap">
+    <table id="mirrors-table">
+      <thead><tr><th></th><th>Name</th><th>URL</th><th>Distribution</th><th>Components</th><th>Arch</th></tr></thead>
+      <tbody>
+      {{range .Content}}
+        <tr>
+          <td><input type="checkbox" name="name" value="{{.Name}}"></td>
+          <td><a href="/mirrors/{{pathEscape .Name}}">{{.Name}}</a></td>
+          <td>{{.ArchiveURL}}</td>
+          <td>{{.Distribution}}</td>
+          <td>{{stringSlice .Components}}</td>
+          <td>{{stringSlice .Architectures}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="6" class="muted">No mirrors</td></tr>
+      {{end}}
+      </tbody>
+    </table>
+  </div>
+  </form>
+</section>
+{{template "footer" .}}
+{{end}}
